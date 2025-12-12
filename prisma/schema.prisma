@@ -1,0 +1,433 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../prisma/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  PLATFORM_ADMIN
+  STUDIO_USER
+}
+
+enum StudioRole {
+  OWNER
+  MANAGER
+  ENGINEER
+  ASSISTANT
+}
+
+enum ProjectType {
+  ALBUM
+  EP
+  SINGLE
+  PODCAST
+  FILM
+  OTHER
+}
+
+enum ProjectStage {
+  DISCOVERY
+  PRE_PRODUCTION
+  TRACKING
+  EDITING
+  MIXING
+  MASTERING
+  DELIVERED
+  ARCHIVED
+}
+
+enum SongStage {
+  WRITING
+  TRACKING
+  EDITING
+  MIXING
+  MASTERING
+  APPROVED
+}
+
+enum SessionType {
+  TRACKING
+  OVERDUB
+  EDITING
+  MIXING
+  MASTERING
+  MEETING
+  OTHER
+}
+
+enum SessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
+enum MixStatus {
+  DRAFT
+  IN_REVIEW
+  CHANGES_REQUESTED
+  APPROVED
+}
+
+enum ContractType {
+  WORK_FOR_HIRE
+  PRODUCER_AGREEMENT
+  COLLABORATION
+  SPLIT_SHEET
+  OTHER
+}
+
+enum ContractStatus {
+  DRAFT
+  SENT
+  SIGNED
+  VOID
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id      String   @id @default(cuid())
+  clerkId String   @unique
+  email   String   @unique
+  name    String?
+  role    UserRole @default(STUDIO_USER)
+
+  memberships     UserStudioMembership[]
+  engineerProfile EngineerProfile?
+
+  // Optional: artist "account" mapping (ArtistProfile may or may not have a login)
+  artistProfile ArtistProfile?
+
+  // Studio ownership (named relation to avoid Prisma creating extra fields)
+  ownedStudios Studio[] @relation("StudioOwner")
+
+  ownedProjects      Project[]    @relation("ProjectOwner")
+  comments           Comment[]
+  tasksAssigned      Task[]       @relation("TaskAssignee")
+  createdMixVersions MixVersion[] @relation("MixCreator")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Studio {
+  id       String @id @default(cuid())
+  name     String
+  slug     String @unique
+  timezone String @default("America/Los_Angeles")
+
+  owner   User?   @relation("StudioOwner", fields: [ownerId], references: [id])
+  ownerId String?
+
+  memberships UserStudioMembership[]
+  rooms       Room[]
+  projects    Project[]
+
+  // Artist/client records for this studio
+  clients ArtistProfile[]
+
+  invoices Invoice[]
+
+  // Engineers that belong to this studio
+  engineers EngineerProfile[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserStudioMembership {
+  id       String     @id @default(cuid())
+  user     User       @relation(fields: [userId], references: [id])
+  userId   String
+  studio   Studio     @relation(fields: [studioId], references: [id])
+  studioId String
+  role     StudioRole
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, studioId])
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  studio      Studio   @relation(fields: [studioId], references: [id])
+  studioId    String
+  name        String
+  description String?
+  hourlyRate  Decimal? @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EngineerProfile {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
+
+  studio   Studio @relation(fields: [studioId], references: [id])
+  studioId String
+
+  rateHourly Decimal? @db.Decimal(10, 2)
+  bio        String?
+
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ArtistProfile {
+  id String @id @default(cuid())
+
+  studio   Studio @relation(fields: [studioId], references: [id])
+  studioId String
+
+  // Optional link to a User account (artist can log in)
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @unique
+
+  name         String
+  contactEmail String?
+  portalSlug   String  @unique
+
+  projects Project[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id       String @id @default(cuid())
+  studio   Studio @relation(fields: [studioId], references: [id])
+  studioId String
+
+  client   ArtistProfile? @relation(fields: [clientId], references: [id])
+  clientId String?
+
+  owner   User?   @relation("ProjectOwner", fields: [ownerId], references: [id])
+  ownerId String?
+
+  title       String
+  type        ProjectType  @default(ALBUM)
+  stage       ProjectStage @default(DISCOVERY)
+  description String?
+
+  budget Decimal? @db.Decimal(10, 2)
+
+  songs     Song[]
+  sessions  Session[]
+  invoices  Invoice[]
+  contracts Contract[]
+  tasks     Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Song {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  title String
+  order Int       @default(0)
+  stage SongStage @default(WRITING)
+
+  bpm         Int?
+  musicalKey  String?
+  durationSec Int?
+
+  mixes  MixVersion[]
+  splits SplitShare[]
+
+  // Opposite side of Task.song
+  tasks Task[]
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Session {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  room   Room?   @relation(fields: [roomId], references: [id])
+  roomId String?
+
+  engineer   EngineerProfile? @relation(fields: [engineerId], references: [id])
+  engineerId String?
+
+  type   SessionType   @default(TRACKING)
+  status SessionStatus @default(SCHEDULED)
+
+  startTime DateTime
+  endTime   DateTime
+
+  notes String?
+
+  tasks Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MixVersion {
+  id     String @id @default(cuid())
+  song   Song   @relation(fields: [songId], references: [id])
+  songId String
+
+  versionLabel String
+  status       MixStatus @default(DRAFT)
+
+  fileUrl      String
+  waveformData Json?
+
+  createdBy   User?   @relation("MixCreator", fields: [createdById], references: [id])
+  createdById String?
+
+  comments Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id    String     @id @default(cuid())
+  mix   MixVersion @relation(fields: [mixId], references: [id])
+  mixId String
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String?
+
+  body         String
+  timestampSec Float?
+  isClient     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+model Contract {
+  id        String  @id @default(cuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  type   ContractType   @default(WORK_FOR_HIRE)
+  status ContractStatus @default(DRAFT)
+
+  title      String
+  fileUrl    String?
+  externalId String?
+
+  signedAt         DateTime?
+  counterpartyName String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SplitShare {
+  id     String @id @default(cuid())
+  song   Song   @relation(fields: [songId], references: [id])
+  songId String
+
+  partyName  String
+  role       String
+  percentage Float
+
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id       String @id @default(cuid())
+  studio   Studio @relation(fields: [studioId], references: [id])
+  studioId String
+
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+
+  number String
+  status InvoiceStatus @default(DRAFT)
+
+  currency String  @default("USD")
+  amount   Decimal @db.Decimal(10, 2)
+
+  issuedAt DateTime?
+  dueAt    DateTime?
+
+  lineItems InvoiceLineItem[]
+  payments  Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studioId, number])
+}
+
+model InvoiceLineItem {
+  id        String  @id @default(cuid())
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+
+  description String
+  quantity    Int     @default(1)
+  unitPrice   Decimal @db.Decimal(10, 2)
+}
+
+model Payment {
+  id        String  @id @default(cuid())
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+
+  amount   Decimal  @db.Decimal(10, 2)
+  currency String   @default("USD")
+  paidAt   DateTime
+
+  provider    String?
+  providerRef String?
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+
+  session   Session? @relation(fields: [sessionId], references: [id])
+  sessionId String?
+
+  song   Song?   @relation(fields: [songId], references: [id])
+  songId String?
+
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  dueAt       DateTime?
+
+  assignee   User?   @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  assigneeId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
