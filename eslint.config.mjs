@@ -35,6 +35,7 @@ export default defineConfig([
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
+      '@typescript-eslint/no-explicit-any': 'off',
 
       // Optional Tailwind rule tweaks (can keep defaults)
       // "tailwindcss/classnames-order": "warn",
