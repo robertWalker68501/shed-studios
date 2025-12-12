@@ -1,155 +1,21 @@
-// app/page.tsx
 import {
   ArrowRight,
   AudioLines,
   SlidersHorizontal,
   LineChart,
   Sparkles,
-  Menu,
-  LogIn,
 } from 'lucide-react';
-import Image from 'next/image';
 
-import { ThemeSwitcher } from '@/components/shared/navigation/theme-switcher';
+import Navbar from '@/components/shared/navigation/Navbar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-
-const navLinks = [
-  { label: 'Product', href: '#product' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Features', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-];
 
 export default function Home() {
   return (
     <main className='bg-background text-foreground min-h-screen'>
       {/* Navbar */}
-      <header className='border-border/60 bg-background/80 sticky top-0 z-40 border-b backdrop-blur'>
-        <div className='container mx-auto flex h-16 items-center justify-between px-4'>
-          {/* Brand */}
-          <div className='flex items-center gap-2'>
-            <div className='flex items-center justify-center shadow-sm'>
-              <Image
-                src='/assets/images/logo-round.png'
-                alt='Shed Studios Logo'
-                width={32}
-                height={32}
-                className='h-8 w-8'
-              />
-            </div>
-            <div className='flex flex-col leading-tight'>
-              <span className='font-heading text-base font-semibold'>
-                Shed Studios
-              </span>
-              <span className='text-muted-foreground text-[11px]'>
-                Studio OS
-              </span>
-            </div>
-          </div>
-
-          {/* Desktop nav */}
-          <nav className='hidden items-center gap-8 text-sm md:flex'>
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className='text-muted-foreground hover:text-foreground text-sm transition-colors'
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          {/* Desktop actions */}
-          <div className='hidden items-center gap-3 md:flex'>
-            {/* Theme selector */}
-            <ThemeSwitcher />
-
-            <Button
-              variant='ghost'
-              size='sm'
-              className='gap-1 text-sm'
-            >
-              <LogIn className='h-4 w-4' />
-              Log in
-            </Button>
-            <Button
-              size='sm'
-              className='gap-1 text-sm'
-            >
-              Start free trial
-              <ArrowRight className='h-3.5 w-3.5' />
-            </Button>
-          </div>
-
-          {/* Mobile menu */}
-          <div className='flex items-center md:hidden'>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  className='border-border/80 h-9 w-9'
-                  aria-label='Open navigation'
-                >
-                  <Menu className='h-5 w-5' />
-                </Button>
-              </SheetTrigger>
-              <SheetContent
-                side='right'
-                className='flex flex-col'
-              >
-                <SheetHeader className='items-start'>
-                  <SheetTitle className='flex items-center gap-2'>
-                    <div className='from-primary to-accent text-primary-foreground flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br'>
-                      <AudioLines className='h-4 w-4' />
-                    </div>
-                    <span className='font-heading text-base'>Shed Studios</span>
-                  </SheetTitle>
-                </SheetHeader>
-
-                {/* Mobile nav links */}
-                <nav className='mt-6 flex flex-1 flex-col gap-3 text-sm'>
-                  {navLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      className='text-muted-foreground hover:bg-muted hover:text-foreground rounded-md px-2 py-2 text-base'
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </nav>
-
-                {/* Mobile theme + actions */}
-                <div className='border-border/70 mt-4 flex flex-col gap-3 border-t pt-4'>
-                  <ThemeSwitcher /> {/* ⬅️ mobile selector */}
-                  <Button
-                    variant='outline'
-                    className='w-full gap-2'
-                  >
-                    <LogIn className='h-4 w-4' />
-                    Log in
-                  </Button>
-                  <Button className='w-full gap-2'>
-                    Start free trial
-                    <ArrowRight className='h-4 w-4' />
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section
