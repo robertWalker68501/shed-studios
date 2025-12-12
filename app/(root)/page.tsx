@@ -8,6 +8,7 @@ import {
   Menu,
   LogIn,
 } from 'lucide-react';
+import Image from 'next/image';
 
 import { ThemeSwitcher } from '@/components/shared/navigation/theme-switcher';
 import { Badge } from '@/components/ui/badge';
@@ -36,8 +37,14 @@ export default function Home() {
         <div className='container mx-auto flex h-16 items-center justify-between px-4'>
           {/* Brand */}
           <div className='flex items-center gap-2'>
-            <div className='from-primary to-accent text-primary-foreground flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br shadow-sm'>
-              <AudioLines className='h-4 w-4' />
+            <div className='flex items-center justify-center shadow-sm'>
+              <Image
+                src='/assets/images/logo-round.png'
+                alt='Shed Studios Logo'
+                width={32}
+                height={32}
+                className='h-8 w-8'
+              />
             </div>
             <div className='flex flex-col leading-tight'>
               <span className='font-heading text-base font-semibold'>
