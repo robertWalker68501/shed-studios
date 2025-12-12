@@ -104,19 +104,17 @@ enum TaskStatus {
 model User {
   id      String   @id @default(cuid())
   clerkId String   @unique
-  email   String   @unique
+  email   String?  @unique
   name    String?
   role    UserRole @default(STUDIO_USER)
 
+  deletedAt DateTime?
+
   memberships     UserStudioMembership[]
   engineerProfile EngineerProfile?
+  artistProfile   ArtistProfile?
 
-  // Optional: artist "account" mapping (ArtistProfile may or may not have a login)
-  artistProfile ArtistProfile?
-
-  // Studio ownership (named relation to avoid Prisma creating extra fields)
-  ownedStudios Studio[] @relation("StudioOwner")
-
+  ownedStudios       Studio[]     @relation("StudioOwner")
   ownedProjects      Project[]    @relation("ProjectOwner")
   comments           Comment[]
   tasksAssigned      Task[]       @relation("TaskAssignee")

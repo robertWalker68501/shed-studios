@@ -5,6 +5,7 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 
 import './globals.css';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+import { ClerkProvider } from '@clerk/nextjs';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -29,20 +30,22 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html
-      lang='en'
-      suppressHydrationWarning
-    >
-      <body className={`${jakarta.variable} font-sans antialiased`}>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang='en'
+        suppressHydrationWarning
+      >
+        <body className={`${jakarta.variable} font-sans antialiased`}>
+          <ThemeProvider
+            attribute='class'
+            defaultTheme='system'
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
