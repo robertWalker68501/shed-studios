@@ -31,10 +31,6 @@ export async function POST(req: NextRequest) {
       const emailAddresses = (data.email_addresses ??
         []) as ClerkEmailAddress[];
 
-      // const primaryEmail =
-      //   emailAddresses.find((e) => e.id === data.primary_email_address_id)
-      //     ?.email_address ?? null;
-
       const primaryEmail =
         emailAddresses.find((e) => e.id === data.primary_email_address_id)
           ?.email_address ??
@@ -45,15 +41,6 @@ export async function POST(req: NextRequest) {
         [data.first_name, data.last_name].filter(Boolean).join(' ') ||
         data.username ||
         null;
-
-      // If your Prisma schema keeps email required, keep this check.
-      // If you changed to email String? @unique, you can remove this check.
-      // if (!primaryEmail) {
-      //   return NextResponse.json(
-      //     { error: 'No primary email on Clerk user' },
-      //     { status: 422 }
-      //   );
-      // }
 
       await prisma.user.upsert({
         where: { clerkId },
