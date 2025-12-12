@@ -31,9 +31,15 @@ export async function POST(req: NextRequest) {
       const emailAddresses = (data.email_addresses ??
         []) as ClerkEmailAddress[];
 
+      // const primaryEmail =
+      //   emailAddresses.find((e) => e.id === data.primary_email_address_id)
+      //     ?.email_address ?? null;
+
       const primaryEmail =
         emailAddresses.find((e) => e.id === data.primary_email_address_id)
-          ?.email_address ?? null;
+          ?.email_address ??
+        emailAddresses[0]?.email_address ??
+        null;
 
       const name =
         [data.first_name, data.last_name].filter(Boolean).join(' ') ||
@@ -42,12 +48,12 @@ export async function POST(req: NextRequest) {
 
       // If your Prisma schema keeps email required, keep this check.
       // If you changed to email String? @unique, you can remove this check.
-      if (!primaryEmail) {
-        return NextResponse.json(
-          { error: 'No primary email on Clerk user' },
-          { status: 422 }
-        );
-      }
+      // if (!primaryEmail) {
+      //   return NextResponse.json(
+      //     { error: 'No primary email on Clerk user' },
+      //     { status: 422 }
+      //   );
+      // }
 
       await prisma.user.upsert({
         where: { clerkId },
@@ -58,9 +64,9 @@ export async function POST(req: NextRequest) {
           deletedAt: null, // ✅ ensure active
         },
         update: {
-          email: primaryEmail,
+          ...(primaryEmail !== null ? { email: primaryEmail } : {}),
           name,
-          deletedAt: null, // ✅ restore if previously deleted
+          deletedAt: null,
         },
       });
 
