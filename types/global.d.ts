@@ -18,8 +18,10 @@ declare global {
   type ActionButtonsProps = {
     variantBtn1?: 'default' | 'outline' | 'ghost' | 'link';
     variantBtn2?: 'default' | 'outline' | 'ghost' | 'link';
+    btn1Href?: string;
     btn1Text?: string;
     btn2Text?: string;
+    btn2Href?: string;
     sizeBtn1?: 'default' | 'sm' | 'lg';
     sizeBtn2?: 'default' | 'sm' | 'lg';
     classNameBtn1?: string;
