@@ -176,8 +176,7 @@ export function DashboardShell({
                 );
               })}
               <SignOutButton>
-                <Link
-                  href=''
+                <button
                   className={buttonVariants({
                     variant: 'default',
                     className: 'mt-3 w-full',
@@ -185,7 +184,7 @@ export function DashboardShell({
                 >
                   <LogOutIcon className='h-4 w-4' />
                   Logout
-                </Link>
+                </button>
               </SignOutButton>
             </nav>
           </div>
