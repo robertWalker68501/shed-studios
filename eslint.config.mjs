@@ -35,7 +35,6 @@ export default defineConfig([
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
-      '@ts-expect-error': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
 
       // Optional Tailwind rule tweaks (can keep defaults)

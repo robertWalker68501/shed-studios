@@ -54,7 +54,6 @@ export default async function AdminStudiosPage({
 
       <StudioManagementCard
         studios={studios}
-        // @ts-expect-error just cuz
         query={query}
       />
     </main>

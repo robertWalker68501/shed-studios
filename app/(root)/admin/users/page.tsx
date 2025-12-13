@@ -53,7 +53,6 @@ export default async function AdminUsersPage({
 
       <UserManagementCard
         users={users}
-        // @ts-expect-error just cuz
         query={query}
         showDeleted={showDeleted}
       />
