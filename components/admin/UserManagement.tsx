@@ -1,3 +1,4 @@
+import { currentUser } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 
 import { Badge } from '@/components/ui/badge';
@@ -163,6 +164,17 @@ export function UserManagementCard({
 
 async function restoreUserAction(formData: FormData) {
   'use server';
+  const clerk = await currentUser();
+  if (!clerk) throw new Error('Unauthorized');
+
+  const appUser = await prisma.user.findFirst({
+    where: { clerkId: clerk.id, deletedAt: null },
+    select: { role: true },
+  });
+
+  if (!appUser || appUser.role !== 'PLATFORM_ADMIN') {
+    throw new Error('Forbidden: PLATFORM_ADMIN role required');
+  }
   const userId = String(formData.get('userId') ?? '');
   if (!userId) return;
 
@@ -175,6 +187,17 @@ async function restoreUserAction(formData: FormData) {
 
 async function updateUserRoleAction(formData: FormData) {
   'use server';
+  const clerk = await currentUser();
+  if (!clerk) throw new Error('Unauthorized');
+
+  const appUser = await prisma.user.findFirst({
+    where: { clerkId: clerk.id, deletedAt: null },
+    select: { role: true },
+  });
+
+  if (!appUser || appUser.role !== 'PLATFORM_ADMIN') {
+    throw new Error('Forbidden: PLATFORM_ADMIN role required');
+  }
   const userId = String(formData.get('userId') ?? '');
   const role = String(formData.get('role') ?? '');
   if (!userId) return;
