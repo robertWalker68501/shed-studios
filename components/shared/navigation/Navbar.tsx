@@ -28,7 +28,10 @@ const Navbar = () => {
         <div className='hidden items-center gap-3 md:flex'>
           {/* Theme selector */}
           <ThemeSwitcher />
-          <ActionButtons />
+          <ActionButtons
+            btn1Href='/sign-in'
+            btn2Href='/'
+          />
         </div>
 
         {/* Mobile menu */}

@@ -1,12 +1,16 @@
+import { UserButton } from '@clerk/nextjs';
 import { ArrowRight, LogIn } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
 const ActionButtons = ({
+  btn1Href = '#',
   variantBtn1 = 'ghost',
   sizeBtn1 = 'sm',
   classNameBtn1 = 'gap-1 text-sm',
   btn1Text = 'Log in',
+  btn2Href = '#',
   variantBtn2 = 'default',
   sizeBtn2 = 'sm',
   classNameBtn2 = 'gap-1 text-sm',
@@ -16,21 +20,32 @@ const ActionButtons = ({
 }: ActionButtonsProps) => {
   return (
     <>
+      <UserButton />
       <Button
         variant={variantBtn1}
         size={sizeBtn1}
-        className={classNameBtn1}
+        asChild
       >
-        <LogIn className={icon1Classes} />
-        {btn1Text}
+        <Link
+          href={btn1Href}
+          className={classNameBtn1}
+        >
+          <LogIn className={icon1Classes} />
+          {btn1Text}
+        </Link>
       </Button>
       <Button
         variant={variantBtn2}
         size={sizeBtn2}
-        className={classNameBtn2}
+        asChild
       >
-        {btn2Text}
-        <ArrowRight className={icon2Classes} />
+        <Link
+          href={btn2Href}
+          className={classNameBtn2}
+        >
+          {btn2Text}
+          <ArrowRight className={icon2Classes} />
+        </Link>
       </Button>
     </>
   );

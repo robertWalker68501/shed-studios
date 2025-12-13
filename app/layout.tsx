@@ -5,7 +5,9 @@ import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 
 import './globals.css';
 import { ThemeProvider } from '@/providers/ThemeProvider';
+
 import { ClerkProvider } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -30,7 +32,11 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        theme: dark,
+      }}
+    >
       <html
         lang='en'
         suppressHydrationWarning
