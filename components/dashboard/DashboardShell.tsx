@@ -43,7 +43,8 @@ const studioNav = [
 
 const adminNav = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/admin', label: 'Admin', icon: Shield },
+  { href: '/admin/users', label: 'Users', icon: Shield },
+  { href: '/admin/studios', label: 'Studios', icon: Shield },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
